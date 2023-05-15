@@ -2,8 +2,10 @@ package org.ulpgc.es;
 
 import org.ulpgc.es.model.Alimento;
 
+import java.util.List;
+
 public interface DBReader {
 
-    Alimento selectAllAlimentos();
+    List<Alimento> selectAllAlimentos();
     Alimento selectAllEjercicios();
 }
