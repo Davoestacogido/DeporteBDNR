@@ -32,11 +32,11 @@ public class Alimento {
     }
 
     public int getCaloriasPer100g() {
-        return caloriasPer100g * (this.cantidadGramos/100);
+        return Math.round(caloriasPer100g * (this.cantidadGramos/100));
     }
 
     public int getProteinasPer100g() {
-        return proteinasPer100g * (this.cantidadGramos/100);
+        return Math.round(proteinasPer100g * (this.cantidadGramos/100));
     }
 
     public void setVegano(boolean vegano) {
