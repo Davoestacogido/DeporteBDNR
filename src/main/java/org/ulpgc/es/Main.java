@@ -1,9 +1,16 @@
 package org.ulpgc.es;
 
-import org.ulpgc.es.readers.MongoDBReader;
+import org.ulpgc.es.commands.exerciseCommands;
+import org.ulpgc.es.commands.foodCommands;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println(new MongoDBReader().selectAllAlimentos());
+        WebSeviceManager webService = new WebSeviceManager();
+
+        webService.add("/ejercicios", new exerciseCommands());
+
+        webService.add("/dietas", new foodCommands());
+
+        webService.start();
     }
 }
