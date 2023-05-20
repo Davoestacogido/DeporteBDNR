@@ -1,13 +1,16 @@
 package org.ulpgc.es;
 
-import org.ulpgc.es.model.Workout;
-import org.ulpgc.es.readers.MongoDBReader;
-
-import java.util.List;
+import org.ulpgc.es.commands.exerciseCommands;
+import org.ulpgc.es.commands.foodCommands;
 
 public class Main {
     public static void main(String[] args) {
-        List<Workout> workouts = new MongoDBReader().selectAllWorkouts();
-        System.out.println();
+        WebSeviceManager webService = new WebSeviceManager();
+
+        webService.add("/ejercicios", new exerciseCommands());
+
+        webService.add("/dietas", new foodCommands());
+
+        webService.start();
     }
 }
