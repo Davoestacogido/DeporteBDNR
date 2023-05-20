@@ -5,5 +5,5 @@ import org.ulpgc.es.model.Recipe;
 
 public interface RecipeDocumentDeserializer {
 
-    Recipe deserialize(Document recipe);
+    Recipe deserialize(Document documentRecipe);
 }

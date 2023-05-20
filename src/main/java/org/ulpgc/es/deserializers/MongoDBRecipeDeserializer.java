@@ -4,9 +4,30 @@ import org.bson.Document;
 import org.ulpgc.es.RecipeDocumentDeserializer;
 import org.ulpgc.es.model.Recipe;
 
+import java.util.List;
+
 public class MongoDBRecipeDeserializer implements RecipeDocumentDeserializer {
+
+
     @Override
-    public Recipe deserialize(Document recipe) {
-        return null;
+    public Recipe deserialize(Document recipeDocument) {
+        Recipe recipe = new Recipe(
+                recipeDocument.getString("_id"),
+                recipeDocument.getString("receta"),
+                recipeDocument.getString("preparacion"),
+                toList(recipeDocument.getString("comida")),
+                toList(recipeDocument.getString("ingredientes"))
+        );
+        addOptionalFieldIfPresent(recipeDocument, recipe);
+        return recipe;
+    }
+
+    private void addOptionalFieldIfPresent(Document recipeDocument, Recipe recipe) {
+        if (recipeDocument.containsKey("opcional"))
+            recipe.setOptional(recipeDocument.getString(recipeDocument.getString("opcional")));
+    }
+
+    private List<String> toList(String foodDocument) {
+        return List.of(foodDocument.substring(0, foodDocument.length() - 1).split(","));
     }
 }

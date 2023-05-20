@@ -5,18 +5,18 @@ import java.util.List;
 public class Workout {
 
     private final String typeExercises;
-    private final List<Exercise> list;
+    private final List<String> exercisesIds;
 
-    public Workout(String typeExercises, List<Exercise> list) {
+    public Workout(String typeExercises, List<String> exercisesIds) {
         this.typeExercises = typeExercises;
-        this.list = list;
+        this.exercisesIds = exercisesIds;
     }
 
     public String getTypeExercises() {
         return typeExercises;
     }
 
-    public List<Exercise> getList() {
-        return list;
+    public List<String> getExercisesIds() {
+        return exercisesIds;
     }
 }

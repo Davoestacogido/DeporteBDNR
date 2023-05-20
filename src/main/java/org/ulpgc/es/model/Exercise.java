@@ -9,7 +9,7 @@ public class Exercise {
     private final String type;
 
     public Exercise(String id, String exercise, int[] reps, String muscle, String type) {
-        _id = id;
+        this._id = id;
         this.exercise = exercise;
         this.reps = reps;
         this.muscle = muscle;

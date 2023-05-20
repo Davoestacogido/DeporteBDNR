@@ -1,5 +1,7 @@
 package org.ulpgc.es.model;
 
+import java.util.List;
+
 public class Food {
 
     private final String _id;
@@ -15,7 +17,7 @@ public class Food {
     private String type;
     private String accompaniment;
     private String anotation;
-    private String mealOfTheDay;
+    private List<String> mealOfTheDay;
 
     public Food(String id, String food, int ration, int gramsAmount, int caloriesPer100g, int proteinsPer100g) {
         _id = id;
@@ -67,7 +69,7 @@ public class Food {
         this.anotation = anotation;
     }
 
-    public void setMealOfTheDay(String mealOfTheDay) {
+    public void setMealOfTheDay(List<String> mealOfTheDay) {
         this.mealOfTheDay = mealOfTheDay;
     }
 
@@ -115,7 +117,7 @@ public class Food {
         return anotation;
     }
 
-    public String getMealOfTheDay() {
+    public List<String> getMealOfTheDay() {
         return mealOfTheDay;
     }
 }

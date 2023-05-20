@@ -7,16 +7,16 @@ public class Recipe {
     private final String _id;
     private final String recipe;
     private final String preparation;
-    private final List<String> foods;
+    private final List<String> meals;
     private String optional;
-    private final List<Food> ingredients;
+    private final List<String> ingredientsIds;
 
-    public Recipe(String id, String recipe, String preparation, List<String> foods, List<Food> ingredients) {
-        _id = id;
+    public Recipe(String id, String recipe, String preparation, List<String> meals, List<String> ingredientsIds) {
+        this._id = id;
         this.recipe = recipe;
         this.preparation = preparation;
-        this.foods = foods;
-        this.ingredients = ingredients;
+        this.meals = meals;
+        this.ingredientsIds = ingredientsIds;
     }
 
     public void setOptional(String optional) {
@@ -35,16 +35,16 @@ public class Recipe {
         return preparation;
     }
 
-    public List<String> getFoods() {
-        return foods;
+    public List<String> getMeals() {
+        return meals;
     }
 
     public String getOptional() {
         return optional;
     }
 
-    public List<Food> getIngredients() {
-        return ingredients;
+    public List<String> getIngredientsIds() {
+        return ingredientsIds;
     }
 }
 

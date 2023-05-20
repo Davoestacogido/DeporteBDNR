@@ -4,5 +4,5 @@ import org.bson.Document;
 import org.ulpgc.es.model.Workout;
 
 public interface WorkoutDocumentDeserializer {
-    Workout deserialize(Document workout);
+    Workout deserialize(Document documentWorkout);
 }

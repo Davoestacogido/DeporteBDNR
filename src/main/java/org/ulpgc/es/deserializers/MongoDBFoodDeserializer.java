@@ -4,7 +4,7 @@ import org.bson.Document;
 import org.ulpgc.es.FoodDocumentDeserializer;
 import org.ulpgc.es.model.Food;
 
-import java.util.Arrays;
+import java.util.List;
 
 public class MongoDBFoodDeserializer implements FoodDocumentDeserializer {
     @Override
@@ -12,10 +12,10 @@ public class MongoDBFoodDeserializer implements FoodDocumentDeserializer {
         Food food = new Food(
                 foodDocument.getString("_id"),
                 foodDocument.getString("alimento"),
-                (Integer) foodDocument.get("racion"),
-                (Integer) foodDocument.get("cantidad_gramos"),
-                (Integer) foodDocument.get("calorias"),
-                (Integer) foodDocument.get("proteinas")
+                foodDocument.getInteger("racion"),
+                foodDocument.getInteger("cantidad_gramos"),
+                foodDocument.getInteger("calorias"),
+                foodDocument.getInteger("proteinas")
                 );
         addOptionalFieldsIfPresent(foodDocument, food);
         return food;
@@ -39,12 +39,12 @@ public class MongoDBFoodDeserializer implements FoodDocumentDeserializer {
 
     private void addVeganIfPresent(Document foodDocument, Food food) {
         if (foodDocument.containsKey("vegano"))
-            food.setVegan(Boolean.parseBoolean(foodDocument.getString("vegano")));
+            food.setVegan(foodDocument.getBoolean("vegano"));
     }
 
     private void addMealIfPresent(Document foodDocument, Food food) {
         if (foodDocument.containsKey("comida"))
-            food.setMealOfTheDay(Arrays.toString(to_list(foodDocument.getString("comida"))));
+            food.setMealOfTheDay(toList(foodDocument.getString("comida")));
     }
 
     private void addSpicesIfPresent(Document foodDocument, Food food) {
@@ -67,7 +67,7 @@ public class MongoDBFoodDeserializer implements FoodDocumentDeserializer {
             food.setAccompaniment(foodDocument.getString("acompanamiento"));
     }
 
-    private String[] to_list(String foodDocument) {
-        return foodDocument.substring(0, foodDocument.length() - 1).split(",");
+    private List<String> toList(String foodDocument) {
+        return List.of(foodDocument.substring(0, foodDocument.length() - 1).split(","));
     }
 }
