@@ -15,8 +15,8 @@ public class MongoDBRecipeDeserializer implements RecipeDocumentDeserializer {
                 recipeDocument.getString("_id"),
                 recipeDocument.getString("receta"),
                 recipeDocument.getString("preparacion"),
-                toList(recipeDocument.getString("comida")),
-                toList(recipeDocument.getString("ingredientes"))
+                recipeDocument.getList("comida", String.class),
+                recipeDocument.getList("ingredientes", String.class)
         );
         addOptionalFieldIfPresent(recipeDocument, recipe);
         return recipe;
@@ -25,9 +25,5 @@ public class MongoDBRecipeDeserializer implements RecipeDocumentDeserializer {
     private void addOptionalFieldIfPresent(Document recipeDocument, Recipe recipe) {
         if (recipeDocument.containsKey("opcional"))
             recipe.setOptional(recipeDocument.getString(recipeDocument.getString("opcional")));
-    }
-
-    private List<String> toList(String foodDocument) {
-        return List.of(foodDocument.substring(0, foodDocument.length() - 1).split(","));
     }
 }

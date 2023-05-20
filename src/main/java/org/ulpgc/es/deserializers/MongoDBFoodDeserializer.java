@@ -4,8 +4,6 @@ import org.bson.Document;
 import org.ulpgc.es.FoodDocumentDeserializer;
 import org.ulpgc.es.model.Food;
 
-import java.util.List;
-
 public class MongoDBFoodDeserializer implements FoodDocumentDeserializer {
     @Override
     public Food deserialize(Document foodDocument) {
@@ -44,7 +42,7 @@ public class MongoDBFoodDeserializer implements FoodDocumentDeserializer {
 
     private void addMealIfPresent(Document foodDocument, Food food) {
         if (foodDocument.containsKey("comida"))
-            food.setMealOfTheDay(toList(foodDocument.getString("comida")));
+            food.setMealOfTheDay(foodDocument.getList("comida", String.class));
     }
 
     private void addSpicesIfPresent(Document foodDocument, Food food) {
@@ -65,9 +63,5 @@ public class MongoDBFoodDeserializer implements FoodDocumentDeserializer {
     private void addAccompanimentIfPresent(Document foodDocument, Food food) {
         if (foodDocument.containsKey("acompanamiento"))
             food.setAccompaniment(foodDocument.getString("acompanamiento"));
-    }
-
-    private List<String> toList(String foodDocument) {
-        return List.of(foodDocument.substring(0, foodDocument.length() - 1).split(","));
     }
 }

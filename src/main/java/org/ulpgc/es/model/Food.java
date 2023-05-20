@@ -20,7 +20,7 @@ public class Food {
     private List<String> mealOfTheDay;
 
     public Food(String id, String food, int ration, int gramsAmount, int caloriesPer100g, int proteinsPer100g) {
-        _id = id;
+        this._id = id;
         this.food = food;
         this.ration = ration;
         this.gramsAmount = gramsAmount;
