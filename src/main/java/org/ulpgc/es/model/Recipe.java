@@ -73,7 +73,7 @@ public class Recipe {
         StringBuilder result = new StringBuilder("");
         for (Food ingredient : ingredients)
             result.append("Del ingrediente \"").append(ingredient.getFood()).append("\" debemos usar ")
-                .append(ingredient.getGramsAmount()).append("\n");
+                .append(ingredient.getRation()).append("\n");
         return result.toString();
     }
 }

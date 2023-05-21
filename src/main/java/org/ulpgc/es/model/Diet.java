@@ -4,10 +4,10 @@ public class Diet {
     private final Recipe breakfast;
     private final Recipe lunch;
     private final Recipe dinner;
-    private int calorieRecommended;
-    private int proteinRecommended;
-    private int realCalories;
-    private int realProteins;
+    private double calorieRecommended;
+    private double proteinRecommended;
+    private double realCalories;
+    private double realProteins;
     private Client client;
 
     public Diet(Recipe breakfast, Recipe lunch, Recipe dinner) {
@@ -24,19 +24,19 @@ public class Diet {
         return breakfast;
     }
 
-    public void setCalorieRecommended(int calorieRecommended) {
+    public void setCalorieRecommended(double calorieRecommended) {
         this.calorieRecommended = calorieRecommended;
     }
 
-    public void setProteinRecommended(int proteinRecommended) {
+    public void setProteinRecommended(double proteinRecommended) {
         this.proteinRecommended = proteinRecommended;
     }
 
-    public void setRealCalories(int realCalories) {
+    public void setRealCalories(double realCalories) {
         this.realCalories = realCalories;
     }
 
-    public void setRealProteins(int realProteins) {
+    public void setRealProteins(double realProteins) {
         this.realProteins = realProteins;
     }
 
@@ -48,19 +48,19 @@ public class Diet {
         return dinner;
     }
 
-    public int getCalorieRecommended() {
+    public double getCalorieRecommended() {
         return calorieRecommended;
     }
 
-    public int getProteinRecommended() {
+    public double getProteinRecommended() {
         return proteinRecommended;
     }
 
-    public int getRealCalories() {
+    public double getRealCalories() {
         return realCalories;
     }
 
-    public int getRealProteins() {
+    public double getRealProteins() {
         return realProteins;
     }
 

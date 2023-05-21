@@ -11,6 +11,7 @@ public class MongoDBFoodDeserializer implements FoodDocumentDeserializer {
                 foodDocument.getString("_id"),
                 foodDocument.getString("alimento"),
                 foodDocument.getInteger("racion"),
+                (Integer) foodDocument.getOrDefault("aumento_racion", foodDocument.getInteger("racion")),
                 foodDocument.getInteger("cantidad_gramos"),
                 foodDocument.getInteger("calorias"),
                 foodDocument.getInteger("proteinas")

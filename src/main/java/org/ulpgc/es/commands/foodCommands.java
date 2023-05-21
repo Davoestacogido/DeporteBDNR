@@ -18,15 +18,13 @@ public class foodCommands implements Command {
     @Override
     public String execute(Map<String, String> parameters) {
         if (parameters.containsKey("tipo_dieta")) {
-            return buildResponse(getDiet(parameters), parameters);
+            return buildResponse(getDiet(parameters));
         }
         return null;
     }
 
-    private String buildResponse(Diet diet, Map<String, String> parameters) {
-        String result = "Se ha solicitado una dieta: " + "\n";
-        result = result + diet.toString();
-        return result;
+    private String buildResponse(Diet diet) {
+        return "Se ha solicitado una dieta: " + "\n" + diet.toString();
     }
 
     private Diet getDiet(Map<String, String> parameters) {
@@ -78,15 +76,15 @@ public class foodCommands implements Command {
         return !Objects.equals(food.getProvide(), "carbohidratos");
     }
 
-    private int sumProteins(List<Recipe> recipes) {
+    private double sumProteins(List<Recipe> recipes) {
         return recipes.stream()
             .map(recipe -> recipe.getIngredients().stream().map(foodCommands::calculateFoodProtein)
-                .reduce(0, Integer::sum))
-            .reduce(0, Integer::sum);
+                .reduce((double) 0, Double::sum))
+            .reduce((double) 0, Double::sum);
     }
 
-    private static int calculateFoodProtein(Food food) {
-        return (food.getProteinsPer100g() / 100) * food.getGramsAmount();
+    private static double calculateFoodProtein(Food food) {
+        return ((double) food.getProteinsPer100g() / 100) * food.getRation();
     }
     private void getNotExccessiveCalorieIntake(List<Recipe> recipes, Client client) {
         while (!notExccessiveCalorieIntake(recipes, client)) {
@@ -124,16 +122,16 @@ public class foodCommands implements Command {
         return sumCalories(recipes) <= client.getCalorieRecommended() + 200;
     }
 
-    private int sumCalories(List<Recipe> recipes) {
+    private double sumCalories(List<Recipe> recipes) {
         return recipes.stream()
             .map(recipe -> recipe.getIngredients().stream().map(foodCommands::calculateFoodCalories)
-                .reduce(0, Integer::sum))
-            .reduce(0, Integer::sum);
+                .reduce((double) 0, Double::sum))
+            .reduce((double) 0, Double::sum);
 
     }
 
-    private static int calculateFoodCalories(Food food) {
-        return (food.getCaloriesPer100g() / 100) * food.getGramsAmount();
+    private static double calculateFoodCalories(Food food) {
+        return ((double) food.getCaloriesPer100g() / 100) * food.getRation();
     }
 
     private void calculateMacronutrients(Client client) {
@@ -158,17 +156,5 @@ public class foodCommands implements Command {
         if (Objects.equals(client.getActivity(), "Alta"))
             BMR = BMR * 1.725;
         return BMR;
-    }
-
-    private static int getNumElementos(Map<String, String> parameters) {
-        String numElementosStr = parameters.get("num_elementos");
-        if (numElementosStr != null) {
-            try {
-                return Integer.parseInt(numElementosStr);
-            } catch (NumberFormatException e) {
-                // Manejo de excepción si no se puede convertir a entero
-            }
-        }
-        return 0;
     }
 }

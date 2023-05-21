@@ -6,8 +6,9 @@ public class Food {
 
     private final String _id;
     private final String food;
-    private final int ration;
-    private int gramsAmount;
+    private int ration;
+    private final int rationIncrease;
+    private final int gramsAmount;
     private final int caloriesPer100g;
     private final int proteinsPer100g;
     private boolean vegan = false;
@@ -19,21 +20,22 @@ public class Food {
     private String anotation;
     private List<String> mealOfTheDay;
 
-    public Food(String id, String food, int ration, int gramsAmount, int caloriesPer100g, int proteinsPer100g) {
+    public Food(String id, String food, int ration, int rationIncrease, int gramsAmount, int caloriesPer100g, int proteinsPer100g) {
         this._id = id;
         this.food = food;
         this.ration = ration;
+        this.rationIncrease = rationIncrease;
         this.gramsAmount = gramsAmount;
         this.caloriesPer100g = caloriesPer100g;
         this.proteinsPer100g = proteinsPer100g;
     }
 
     public void increaseRacion() {
-        this.gramsAmount = this.gramsAmount + this.ration;
+        this.ration = this.ration + this.rationIncrease;
     }
 
     public void decreaseRacion() {
-        this.gramsAmount = Math.min(0, this.gramsAmount - this.ration);
+        this.ration = Math.max(0, this.ration - this.rationIncrease);
     }
 
     public int getCaloriesPer100g() {
