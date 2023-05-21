@@ -1,6 +1,9 @@
 package org.ulpgc.es.model;
 
 public class Client {
+    /*
+    Información de un cliente que acaba de realizar una solicitud de una dieta
+     */
     private final int weight;
     private final int height;
     private final String diet;

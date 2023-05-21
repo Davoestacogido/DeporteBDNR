@@ -2,10 +2,13 @@ package org.ulpgc.es;
 
 import org.ulpgc.es.commands.exerciseCommands;
 import org.ulpgc.es.commands.foodCommands;
-import org.ulpgc.es.readers.MongoDBReader;
 
 public class Main {
     public static void main(String[] args) {
+        /*
+        Esta clase es la principal, se encarga de poner en marcha el servicio web
+         */
+
 
         WebSeviceManager webService = new WebSeviceManager();
 
@@ -14,9 +17,5 @@ public class Main {
         webService.add("/dietas", new foodCommands());
 
         webService.start();
-
-
-        MongoDBReader reader =  new MongoDBReader();
-        reader.selectOneDayDiet(true);
     }
 }

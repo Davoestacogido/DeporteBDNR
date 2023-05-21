@@ -5,6 +5,9 @@ import org.ulpgc.es.FoodDocumentDeserializer;
 import org.ulpgc.es.model.Food;
 
 public class MongoDBFoodDeserializer implements FoodDocumentDeserializer {
+    /*
+Tal y como indicaba la interfaz, transforma un Documento de MongoDB a un objeto de java
+ */
     @Override
     public Food deserialize(Document foodDocument) {
         Food food = new Food(

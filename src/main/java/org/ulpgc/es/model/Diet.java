@@ -1,6 +1,9 @@
 package org.ulpgc.es.model;
 
 public class Diet {
+    /*
+       Indica información acerca de la dieta que se le recomendará a un cliente
+ */
     private final Recipe breakfast;
     private final Recipe lunch;
     private final Recipe dinner;

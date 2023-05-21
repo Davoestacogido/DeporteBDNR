@@ -1,6 +1,5 @@
 package org.ulpgc.es.commands;
 
-import org.bson.Document;
 import org.ulpgc.es.Command;
 import org.ulpgc.es.model.Client;
 import org.ulpgc.es.model.Diet;
@@ -14,17 +13,34 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class foodCommands implements Command {
-
+    /*
+    Esta clase es encargada de solventar las peticiones sobre comidas y dietas
+     */
     private final MongoDBReader reader = new MongoDBReader();
     @Override
     public String execute(Map<String, String> parameters) {
+        /*
+        esta es la función principal, para las
+        solicitudes sobre comidas, se decide su resultado en base a los parámetros que puso
+         */
         if (parameters.containsKey("tipo_dieta"))
-            return buildResponse(getDiet(parameters));
-        if (parameters.containsKey("comida")) {
-            return buildResponse(getFood(parameters));
-        }
-
+            return buildResponse(getDiet(parameters)); // obtiene una dieta
+        if (parameters.containsKey("alimento"))
+            return buildResponse(getFood(parameters)); //obtiene info sobre un alimento
+        if (parameters.containsKey("comida"))
+            return buildResponse(getMealRecipes(parameters), parameters.get("comida")); // obtiene alimentos sobre una comida del dia
         return "Siga el manual para poder utilizar correctamente la app.";
+    }
+
+    private String buildResponse(List<Recipe> mealFoods, String meal) {
+        StringBuilder result = new StringBuilder("Las siguientes recetas pertencen a la comida: \"" + meal + "\"\n\n\n");
+        for (Recipe recipe : mealFoods)
+            result.append(recipe.toString()).append("\n");
+        return result.toString();
+    }
+
+    private List<Recipe> getMealRecipes(Map<String, String> parameters) {
+        return reader.selectRecipeFromMeal(parameters.get("comida"));
     }
 
     private String buildResponse(Food food) {
@@ -32,7 +48,7 @@ public class foodCommands implements Command {
     }
 
     private Food getFood(Map<String, String> parameters) {
-        return reader.selectOneFood(parameters.get("comida"));
+        return reader.selectOneFood(parameters.get("alimento"));
 
     }
 
@@ -41,6 +57,9 @@ public class foodCommands implements Command {
     }
 
     private Diet getDiet(Map<String, String> parameters) {
+        /*
+        A partir de los parámetros crea un objeto cliente que identifica quien y que clase de solicitud realizó
+         */
         Client client = new Client(
             Integer.parseInt(parameters.get("peso")),
             Integer.parseInt(parameters.get("altura")),
@@ -48,10 +67,10 @@ public class foodCommands implements Command {
             (parameters.containsKey("vegana") && (Objects.equals(parameters.get("vegana"), "si"))),
             parameters.get("actividad"),
             Integer.parseInt(parameters.get("edad")),
-            parameters.get("género")
+            parameters.get("genero")
         );
-        calculateMacronutrients(client);
-        List<Recipe> recipes = calculateFoodRations(reader.selectOneDayDiet(client.isVegan()), client);
+        calculateMacronutrients(client); // calcula calorias y proteinas que debe tomar en base a su dieta
+        List<Recipe> recipes = calculateFoodRations(reader.selectOneDayDiet(client.isVegan()), client); // calcula las raciones de cada comida
         return createDiet(client, recipes);
     }
 
@@ -66,9 +85,9 @@ public class foodCommands implements Command {
     }
 
     private List<Recipe> calculateFoodRations(List<Recipe> recipes, Client client) {
-        getEnoughProtein(recipes, client);
-        getEnoughCalories(recipes, client);
-        getNotExccessiveCalorieIntake(recipes, client);
+        getEnoughProtein(recipes, client); //suficientes proteinas
+        getEnoughCalories(recipes, client); //suficientes calorias
+        getNotExccessiveCalorieIntake(recipes, client); // reducir calorias si fueron demasiadas
         return recipes;
     }
 
@@ -76,8 +95,8 @@ public class foodCommands implements Command {
         while (sumProteins(recipes) < client.getProteinRecommended()) {
             for (Recipe recipe : recipes) {
                 for (Food ingredient : getIngredientsHighProtein(recipe))  {
-                    ingredient.increaseRacion();
-                }
+                    ingredient.increaseRacion(); // para añadir mas proteina, aumentamos cantidad de comida en ingredientes
+                }                                  // altos en proteina
             }
         }
     }
@@ -106,8 +125,8 @@ public class foodCommands implements Command {
         while (!notExccessiveCalorieIntake(recipes, client)) {
             for (Recipe recipe : recipes) {
                 for (Food ingredient : getIngredientsNotHighProtein(recipe))  {
-                    ingredient.decreaseRacion();
-                }
+                    ingredient.decreaseRacion(); //para aumentar o reducir calorias, modificamos las cantidades de los
+                }                                //alimentos que no sean especialmente altos en proteinas
             }
         }
     }
@@ -165,11 +184,11 @@ public class foodCommands implements Command {
             BMR = 10 * client.getWeight() + 6.25 * client.getHeight() - 5 * client.getAge() + 5;
         if (client.getGender().equals("femenino"))
             BMR = 10 * client.getWeight() + 6.25 * client.getHeight() - 5 * client.getAge() - 161;
-        if (Objects.equals(client.getActivity(), "Poca"))
+        if (Objects.equals(client.getActivity(), "poca"))
             BMR = BMR * 1.2;
-        if (Objects.equals(client.getActivity(), "Media"))
+        if (Objects.equals(client.getActivity(), "media"))
             BMR = BMR * 1.55;
-        if (Objects.equals(client.getActivity(), "Alta"))
+        if (Objects.equals(client.getActivity(), "alta"))
             BMR = BMR * 1.725;
         return BMR;
     }

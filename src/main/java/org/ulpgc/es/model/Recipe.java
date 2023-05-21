@@ -2,10 +2,11 @@ package org.ulpgc.es.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Recipe {
-
+    /*
+    Es el equivalente a los JSON de recetas
+     */
     private final String _id;
     private final String recipe;
     private final String preparation;

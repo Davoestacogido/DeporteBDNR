@@ -4,10 +4,10 @@ import org.bson.Document;
 import org.ulpgc.es.RecipeDocumentDeserializer;
 import org.ulpgc.es.model.Recipe;
 
-import java.util.List;
-
 public class MongoDBRecipeDeserializer implements RecipeDocumentDeserializer {
-
+    /*
+    Tal y como indicaba la interfaz, transforma un Documento de MongoDB a un objeto de java
+     */
 
     @Override
     public Recipe deserialize(Document recipeDocument) {

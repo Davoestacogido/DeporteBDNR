@@ -3,7 +3,9 @@ package org.ulpgc.es.model;
 import java.util.List;
 
 public class Food {
-
+    /*
+    Es el equivalente a los JSON de comidas, pero con funciones para aumentar o disminuir su cantidad de gramos
+     */
     private final String _id;
     private final String food;
     private int ration;
@@ -39,11 +41,11 @@ public class Food {
     }
 
     public int getCaloriesPer100g() {
-        return Math.round(caloriesPer100g * (this.gramsAmount /100));
+        return caloriesPer100g ;
     }
 
     public int getProteinsPer100g() {
-        return Math.round(proteinsPer100g * (this.gramsAmount /100));
+        return proteinsPer100g ;
     }
 
     public void setVegan(boolean vegan) {
@@ -88,10 +90,6 @@ public class Food {
 
     public int getRation() {
         return ration;
-    }
-
-    public int getGramsAmount() {
-        return gramsAmount;
     }
 
     public boolean isVegan() {
