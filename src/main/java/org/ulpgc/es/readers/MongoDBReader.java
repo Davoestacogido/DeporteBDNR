@@ -105,4 +105,10 @@ public class MongoDBReader implements DBReader {
         for (String ingredientId : recipe.getIngredientsIds())
             recipe.add(foodDeserializer.deserialize(Objects.requireNonNull(foods.find(new Document("_id", ingredientId)).first())));
     }
+
+    public Food selectOneFood(String food) {
+        return foodDeserializer.deserialize(
+            Objects.requireNonNull(foods.find(
+                new Document("alimento", food)).first()));
+    }
 }

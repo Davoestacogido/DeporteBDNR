@@ -125,4 +125,19 @@ public class Food {
     public List<String> getMealOfTheDay() {
         return mealOfTheDay;
     }
+
+    @Override
+    public String toString() {
+        return "La siguiente comida \"" + food + "\" conta de las siguientes caracteristicas: \n" +
+            "Calorias cada 100 gramos \"" + caloriesPer100g + "\". " +
+            "Proteinas cada 100 gramos \"" + proteinsPer100g + "\". " +
+            (origin!= null ? "Es de origen: \"" + origin + "\"\n": "") +
+            (provide!= null ? "La comida aporta: \"" + provide + "\"\n": "") +
+            (spices!= null ? "Recomendaciones para cocinar: \"" + spices + "\"\n": "") +
+            (type!= null ? "Es de tipo: \"" + type + "\"\n": "") +
+            (accompaniment!= null ? "se recomienda acompañar con: \"" + accompaniment + "\"\n": "") +
+            (anotation!= null ? "Puntos a tener en cuenta: \"" + anotation + "\"\n": "") +
+            "Vegana \"" + vegan + "\" " +
+            "La cantidad de comida (racion) que debera consumir del alimento es: \"" + ration + "\"";
+    }
 }

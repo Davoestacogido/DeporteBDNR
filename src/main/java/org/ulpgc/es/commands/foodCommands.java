@@ -1,5 +1,6 @@
 package org.ulpgc.es.commands;
 
+import org.bson.Document;
 import org.ulpgc.es.Command;
 import org.ulpgc.es.model.Client;
 import org.ulpgc.es.model.Diet;
@@ -17,10 +18,22 @@ public class foodCommands implements Command {
     private final MongoDBReader reader = new MongoDBReader();
     @Override
     public String execute(Map<String, String> parameters) {
-        if (parameters.containsKey("tipo_dieta")) {
+        if (parameters.containsKey("tipo_dieta"))
             return buildResponse(getDiet(parameters));
+        if (parameters.containsKey("comida")) {
+            return buildResponse(getFood(parameters));
         }
-        return null;
+
+        return "Siga el manual para poder utilizar correctamente la app.";
+    }
+
+    private String buildResponse(Food food) {
+        return food.toString();
+    }
+
+    private Food getFood(Map<String, String> parameters) {
+        return reader.selectOneFood(parameters.get("comida"));
+
     }
 
     private String buildResponse(Diet diet) {
@@ -32,13 +45,17 @@ public class foodCommands implements Command {
             Integer.parseInt(parameters.get("peso")),
             Integer.parseInt(parameters.get("altura")),
             parameters.get("tipo_dieta"),
-            (parameters.containsKey("vegana") && (Objects.equals(parameters.get("vegana"), "vegana"))),
+            (parameters.containsKey("vegana") && (Objects.equals(parameters.get("vegana"), "si"))),
             parameters.get("actividad"),
             Integer.parseInt(parameters.get("edad")),
             parameters.get("género")
         );
         calculateMacronutrients(client);
         List<Recipe> recipes = calculateFoodRations(reader.selectOneDayDiet(client.isVegan()), client);
+        return createDiet(client, recipes);
+    }
+
+    private Diet createDiet(Client client, List<Recipe> recipes) {
         Diet diet = new Diet(recipes.get(0), recipes.get(1), recipes.get(2));
         diet.setCalorieRecommended(client.getCalorieRecommended());
         diet.setProteinRecommended(client.getProteinRecommended());
@@ -46,7 +63,6 @@ public class foodCommands implements Command {
         diet.setRealProteins(sumProteins(recipes));
         diet.setClient(client);
         return diet;
-
     }
 
     private List<Recipe> calculateFoodRations(List<Recipe> recipes, Client client) {
