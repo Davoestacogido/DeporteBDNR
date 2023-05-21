@@ -1,15 +1,19 @@
 package org.ulpgc.es.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Recipe {
-
+    /*
+    Es el equivalente a los JSON de recetas
+     */
     private final String _id;
     private final String recipe;
     private final String preparation;
     private final List<String> meals;
     private String optional;
     private final List<String> ingredientsIds;
+    private List<Food> ingredients = new ArrayList<>();
 
     public Recipe(String id, String recipe, String preparation, List<String> meals, List<String> ingredientsIds) {
         this._id = id;
@@ -17,6 +21,18 @@ public class Recipe {
         this.preparation = preparation;
         this.meals = meals;
         this.ingredientsIds = ingredientsIds;
+    }
+
+    public boolean add(Food food) {
+        return getIngredients().add(food);
+    }
+
+    public List<Food> getIngredients() {
+        return ingredients;
+    }
+
+    public void setIngredients(List<Food> ingredients) {
+        this.ingredients = ingredients;
     }
 
     public void setOptional(String optional) {
@@ -45,6 +61,21 @@ public class Recipe {
 
     public List<String> getIngredientsIds() {
         return ingredientsIds;
+    }
+
+    @Override
+    public String toString() {
+        return "La receta de \"" + recipe + "\", su preparacion consiste en lo siguiente: " + preparation + "\n" +
+            (optional!= null ? "Adicional: " + optional + "\n": "") +
+            getFoodMeaningfulInformation();
+    }
+
+    private String getFoodMeaningfulInformation() {
+        StringBuilder result = new StringBuilder("");
+        for (Food ingredient : ingredients)
+            result.append("Del ingrediente \"").append(ingredient.getFood()).append("\" debemos usar ")
+                .append(ingredient.getRation()).append("\n");
+        return result.toString();
     }
 }
 

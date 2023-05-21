@@ -1,55 +1,57 @@
 package org.ulpgc.es.commands;
 
 import org.ulpgc.es.Command;
+import org.ulpgc.es.model.Exercise;
+import org.ulpgc.es.readers.MongoDBReader;
 
+import java.util.List;
 import java.util.Map;
 
 public class exerciseCommands implements Command {
+    /*
+    Encargado de resolver las consultas realizadas respecto a ejercicios
+     */
+
+    private final MongoDBReader reader = new MongoDBReader();
+
     @Override
     public String execute(Map<String, String> parameters) {
-        String musculo = parameters.get("musculo");
-        String tipoEjercicio = parameters.get("tipo_ejercicio");
-        int numElementos = getNumElementos(parameters);
-        return x(musculo, tipoEjercicio, numElementos);
+        /*
+        esta es la función principal, para las
+        solicitudes sobre ejercicios, se decide su resultado en base a los parámetros que puso
+        hay que entender lo siguiente
+        WorkoutDay = día de entreno, que puede ser de empuje, de jalón o piernas
+        Workout = entrenamiento, que puede ser del tipo hipertrofia o del tipo fuerza
+         */
+        if (parameters.containsKey("dia_de_entreno")) //devuelve un dia de empuje o jalon o piernas
+            return buildResponse(getExercisesFromWorkoutDay(parameters));
+        if (parameters.containsKey("entrenamiento")) //devuelve ejercicios de hipertrofia o fuerza
+            return buildResponse(getExercisesFromWorkout(parameters));
+        if (parameters.containsKey("musculo")) //devuelve ejercicios respecto a un músculo en concreto
+            return buildResponse(getExercisesFromMuscle(parameters));
+        return "Siga el manual para poder utilizar correctamente la app.";
     }
 
-    private String x(String musculo, String tipoEjercicio, int numElementos) {
-        StringBuilder response = builder(musculo, tipoEjercicio, numElementos);
-
-        // Verificar si se pudo construir la respuesta
-        if (response.length() == 0) {
-            return "Not found (Error 404)";
-        }
-
-        return response.toString();
+    private List<Exercise> getExercisesFromWorkout(Map<String, String> parameters) {
+        return reader.selectExercisesFromWorkout(parameters.get("entrenamiento"), Integer.parseInt(parameters.get("num_ejs")));
     }
 
-    static StringBuilder builder(String musculo, String tipoEjercicio, int numElementos) {
-        StringBuilder response = new StringBuilder("Conectado al apartado de ejercicios");
-
-        if (musculo != null) {
-            response.append(" por músculo: ").append(musculo);
-        }
-
-        if (tipoEjercicio != null) {
-            response.append(" por tipo de ejercicio: ").append(tipoEjercicio);
-        }
-
-        if (numElementos > 0) {
-            response.append("\nNúmero de elementos: ").append(numElementos);
-        }
-        return response;
+    private List<Exercise> getExercisesFromWorkoutDay(Map<String, String> parameters) {
+        if (parameters.containsKey("musculo")) // musculo es un parámetro opcional, si lo tiene o no cambia que método del reader se llama
+            return reader.selectExercisesFromWorkoutDay(
+                parameters.get("dia_de_entreno"), Integer.parseInt(parameters.get("num_ejs")), parameters.get("musculo"));
+        return reader.selectExercisesFromWorkoutDay(
+            parameters.get("dia_de_entreno"), Integer.parseInt(parameters.get("num_ejs")));
     }
 
-    private static int getNumElementos(Map<String, String> parameters) {
-        String numElementosStr = parameters.get("num_elementos");
-        if (numElementosStr != null) {
-            try {
-                return Integer.parseInt(numElementosStr);
-            } catch (NumberFormatException e) {
-                // Manejo de excepción si no se puede convertir a entero
-            }
-        }
-        return 0;
+    private String buildResponse(List<Exercise> exercises) {
+        StringBuilder result = new StringBuilder("La lista de ejercicios correspondientes son los siguientes: \n");
+        for (Exercise exercise : exercises)
+            result.append(exercise.toString()).append("\n");
+        return result.toString();
+    }
+
+    private List<Exercise> getExercisesFromMuscle(Map<String, String> parameters) {
+        return reader.selectExercisesFromMuscle(parameters.get("musculo"));
     }
 }
