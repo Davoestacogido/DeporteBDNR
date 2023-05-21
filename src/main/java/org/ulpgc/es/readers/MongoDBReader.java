@@ -1,8 +1,11 @@
 package org.ulpgc.es.readers;
 
-import com.mongodb.client.*;
-import org.ulpgc.es.DBReader;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
+import org.ulpgc.es.DBReader;
 import org.ulpgc.es.deserializers.MongoDBExerciseDeserializer;
 import org.ulpgc.es.deserializers.MongoDBFoodDeserializer;
 import org.ulpgc.es.deserializers.MongoDBRecipeDeserializer;
@@ -12,9 +15,10 @@ import org.ulpgc.es.model.Food;
 import org.ulpgc.es.model.Recipe;
 import org.ulpgc.es.model.Workout;
 
-import java.util.*;
-
-import static com.mongodb.client.model.Aggregates.limit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Random;
 
 public class MongoDBReader implements DBReader {
 
@@ -62,12 +66,18 @@ public class MongoDBReader implements DBReader {
         List<Recipe> recipeList = new ArrayList<>();
         recipeList.add(getMeal("desayuno", vegan));
         recipeList.add(getMeal("almuerzo", vegan));
-        recipeList.add(getMeal("cena", vegan));
+        recipeList.add(getMeal("cena", vegan, recipeList.get(1).get_id()));
         return recipeList;
     }
 
-    private Recipe getMeal(String desayuno, boolean vegan) {
-        Document recipeQuery = new Document("comida", desayuno);
+    private Recipe getMeal(String meal, boolean vegan) {
+        Document recipeQuery = new Document("comida", meal);
+        return getRecipe(vegan, recipeQuery);
+    }
+
+    private Recipe getMeal(String meal, boolean vegan, String usedFoodId) {
+        Document recipeQuery = new Document("comida", meal);
+        recipeQuery.append("_id", new Document("$ne",usedFoodId));
         return getRecipe(vegan, recipeQuery);
     }
 

@@ -2,6 +2,7 @@ package org.ulpgc.es.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Recipe {
 
@@ -59,6 +60,21 @@ public class Recipe {
 
     public List<String> getIngredientsIds() {
         return ingredientsIds;
+    }
+
+    @Override
+    public String toString() {
+        return "La receta de \"" + recipe + "\", su preparacion consiste en lo siguiente: " + preparation + "\n" +
+            (optional!= null ? "Adicional: " + optional + "\n": "") +
+            getFoodMeaningfulInformation();
+    }
+
+    private String getFoodMeaningfulInformation() {
+        StringBuilder result = new StringBuilder("");
+        for (Food ingredient : ingredients)
+            result.append("Del ingrediente \"").append(ingredient.getFood()).append("\" debemos usar ")
+                .append(ingredient.getGramsAmount()).append("\n");
+        return result.toString();
     }
 }
 

@@ -2,43 +2,138 @@ package org.ulpgc.es.commands;
 
 import org.ulpgc.es.Command;
 import org.ulpgc.es.model.Client;
+import org.ulpgc.es.model.Diet;
+import org.ulpgc.es.model.Food;
 import org.ulpgc.es.model.Recipe;
 import org.ulpgc.es.readers.MongoDBReader;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class foodCommands implements Command {
 
     private final MongoDBReader reader = new MongoDBReader();
     @Override
     public String execute(Map<String, String> parameters) {
-        String tipoDieta = parameters.get("tipo_dieta");
-        String comida = parameters.get("comida");
         if (parameters.containsKey("tipo_dieta")) {
-            List<Recipe> recipes = getDiet(parameters);
+            return buildResponse(getDiet(parameters), parameters);
         }
-        int numElementos = getNumElementos(parameters);
-        return generarRespuesta(tipoDieta, comida, numElementos);
+        return null;
     }
 
-    private List<Recipe> getDiet(Map<String, String> parameters) {
+    private String buildResponse(Diet diet, Map<String, String> parameters) {
+        String result = "Se ha solicitado una dieta: " + "\n";
+        result = result + diet.toString();
+        return result;
+    }
+
+    private Diet getDiet(Map<String, String> parameters) {
         Client client = new Client(
             Integer.parseInt(parameters.get("peso")),
             Integer.parseInt(parameters.get("altura")),
-            parameters.get("dieta"),
+            parameters.get("tipo_dieta"),
             (parameters.containsKey("vegana") && (Objects.equals(parameters.get("vegana"), "vegana"))),
             parameters.get("actividad"),
             Integer.parseInt(parameters.get("edad")),
             parameters.get("género")
         );
         calculateMacronutrients(client);
-        return calculateFoodRations(reader.selectOneDayDiet(client.isVegan()), client);
+        List<Recipe> recipes = calculateFoodRations(reader.selectOneDayDiet(client.isVegan()), client);
+        Diet diet = new Diet(recipes.get(0), recipes.get(1), recipes.get(2));
+        diet.setCalorieRecommended(client.getCalorieRecommended());
+        diet.setProteinRecommended(client.getProteinRecommended());
+        diet.setRealCalories(sumCalories(recipes));
+        diet.setRealProteins(sumProteins(recipes));
+        diet.setClient(client);
+        return diet;
+
     }
 
-    private List<Recipe> calculateFoodRations(List<Recipe> selectOneDayDiet, Client client) {
-        return null;
+    private List<Recipe> calculateFoodRations(List<Recipe> recipes, Client client) {
+        getEnoughProtein(recipes, client);
+        getEnoughCalories(recipes, client);
+        getNotExccessiveCalorieIntake(recipes, client);
+        return recipes;
+    }
+
+    private void getEnoughProtein(List<Recipe> recipes, Client client) {
+        while (sumProteins(recipes) < client.getProteinRecommended()) {
+            for (Recipe recipe : recipes) {
+                for (Food ingredient : getIngredientsHighProtein(recipe))  {
+                    ingredient.increaseRacion();
+                }
+            }
+        }
+    }
+
+    private List<Food> getIngredientsHighProtein(Recipe recipe) {
+        return recipe.getIngredients().stream().filter(this::isHighProtein).collect(Collectors.toList());
+    }
+
+    private boolean isHighProtein(Food food) {
+        if (food.getProvide() == null)
+            return true;
+        return !Objects.equals(food.getProvide(), "carbohidratos");
+    }
+
+    private int sumProteins(List<Recipe> recipes) {
+        return recipes.stream()
+            .map(recipe -> recipe.getIngredients().stream().map(foodCommands::calculateFoodProtein)
+                .reduce(0, Integer::sum))
+            .reduce(0, Integer::sum);
+    }
+
+    private static int calculateFoodProtein(Food food) {
+        return (food.getProteinsPer100g() / 100) * food.getGramsAmount();
+    }
+    private void getNotExccessiveCalorieIntake(List<Recipe> recipes, Client client) {
+        while (!notExccessiveCalorieIntake(recipes, client)) {
+            for (Recipe recipe : recipes) {
+                for (Food ingredient : getIngredientsNotHighProtein(recipe))  {
+                    ingredient.decreaseRacion();
+                }
+            }
+        }
+    }
+
+    private void getEnoughCalories(List<Recipe> recipes, Client client) {
+        while (!enoughCalorieIntake(recipes, client)) {
+            for (Recipe recipe : recipes) {
+                for (Food ingredient : getIngredientsNotHighProtein(recipe))  {
+                    ingredient.increaseRacion();
+                }
+            }
+        }
+    }
+
+    private List<Food> getIngredientsNotHighProtein(Recipe recipe) {
+        return recipe.getIngredients().stream().filter(this::notHighProtein).collect(Collectors.toList());
+    }
+
+    private boolean notHighProtein(Food food) {
+        return !Objects.isNull(food.getProvide()) & Objects.equals(food.getProvide(), "carbohidratos");
+    }
+
+    private boolean enoughCalorieIntake(List<Recipe> recipes, Client client) {
+        return sumCalories(recipes) >= client.getCalorieRecommended() - 200;
+    }
+
+    private boolean notExccessiveCalorieIntake(List<Recipe> recipes, Client client) {
+        return sumCalories(recipes) <= client.getCalorieRecommended() + 200;
+    }
+
+    private int sumCalories(List<Recipe> recipes) {
+        return recipes.stream()
+            .map(recipe -> recipe.getIngredients().stream().map(foodCommands::calculateFoodCalories)
+                .reduce(0, Integer::sum))
+            .reduce(0, Integer::sum);
+
+    }
+
+    private static int calculateFoodCalories(Food food) {
+        return (food.getCaloriesPer100g() / 100) * food.getGramsAmount();
     }
 
     private void calculateMacronutrients(Client client) {
@@ -46,7 +141,7 @@ public class foodCommands implements Command {
         if (Objects.equals(client.getDiet(), "volumen"))
             client.setCalorieRecommended((int) (BMR + 300));
         if (Objects.equals(client.getDiet(), "definicion"))
-            client.setCalorieRecommended((int) (BMR - 200));
+            client.setCalorieRecommended((int) (BMR - 300));
         client.setProteinRecommended(client.getWeight() * 2);
     }
 
@@ -63,34 +158,6 @@ public class foodCommands implements Command {
         if (Objects.equals(client.getActivity(), "Alta"))
             BMR = BMR * 1.725;
         return BMR;
-    }
-
-    private String generarRespuesta(String tipoDieta, String comida, int numElementos) {
-        StringBuilder response = builder(tipoDieta, comida, numElementos);
-
-        // Verificar si se pudo construir la respuesta
-        if (response.length() == 0) {
-            return "Not found (Error 404)";
-        }
-
-        return response.toString();
-    }
-
-    static StringBuilder builder(String tipoDieta, String comida, int numElementos) {
-        StringBuilder response = new StringBuilder("Conectado al apartado de comidas de dieta");
-
-        if (tipoDieta != null) {
-            response.append(" por tipo de dieta: ").append(tipoDieta);
-        }
-
-        if (comida != null) {
-            response.append(" por tipo de comida: ").append(comida);
-        }
-
-        if (numElementos > 0) {
-            response.append("\nNúmero de elementos: ").append(numElementos);
-        }
-        return response;
     }
 
     private static int getNumElementos(Map<String, String> parameters) {

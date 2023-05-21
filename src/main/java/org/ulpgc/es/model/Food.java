@@ -28,9 +28,12 @@ public class Food {
         this.proteinsPer100g = proteinsPer100g;
     }
 
-    public Food increaseRacion() {
+    public void increaseRacion() {
         this.gramsAmount = this.gramsAmount + this.ration;
-        return this;
+    }
+
+    public void decreaseRacion() {
+        this.gramsAmount = Math.min(0, this.gramsAmount - this.ration);
     }
 
     public int getCaloriesPer100g() {
